@@ -118,6 +118,12 @@ namespace EnemyListDebuffs.StatusNode
             {
                 var nodeGroup = new StatusNodeGroup(_plugin);
                 var buttonComponent = *(&enemyListAddon->EnemyOneComponent)[i];
+                // 台服加固：雙重間接取值後，component 指針可能為 null（該敵人格未配置／半重建）。
+                // 解參考前判空；null 就 skip 該格。此時 nodeGroup 尚未配置任何原生記憶體
+                // （原生節點於 nodeGroup.BuildNodes 才配置），直接略過不會洩漏。
+                if (buttonComponent == null)
+                    continue;
+
                 if (!nodeGroup.BuildNodes(StartingNodeId))
                 {
                     DestroyNodes();
@@ -148,6 +154,15 @@ namespace EnemyListDebuffs.StatusNode
             for(byte i = 0; i < AddonEnemyList.MaxEnemyCount; i++)
             {
                 var buttonComponent = *(&enemyListAddon->EnemyOneComponent)[i];
+
+                // 台服加固：component 指針可能為 null（addon 半重建／釋放）。解參考前判空。
+                // null 時 addon 樹已消失：不做 sibling 反鏈與 UpdateDrawNodeList（兩者都會踩已釋放記憶體＝AVE），
+                // 僅丟棄我方 C# 追蹤（我方注入的原生節點已隨 addon 樹被遊戲一併釋放，不可再 Destroy＝避免二次釋放）。
+                if (buttonComponent == null)
+                {
+                    NodeGroups[i] = null;
+                    continue;
+                }
 
                 if (NodeGroups[i] != null)
                 {
