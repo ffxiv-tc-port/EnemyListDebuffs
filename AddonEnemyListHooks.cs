@@ -96,7 +96,16 @@ namespace EnemyListDebuffs
                         return;
                 }
 
-                var numArray = AtkStage.Instance()->GetNumberArrayData(NumberArrayType.EnemyList);
+                // 台服加固：AtkStage.Instance() 是 [StaticAddress(..., isPointer:true)]，
+                // 屬「解參考靜態指標」語意、可能為 null（非 lea 取本身位址的 A 類），故判空是必要而非死碼。
+                var atkStage = AtkStage.Instance();
+                if (atkStage == null)
+                {
+                    _origDrawFunc(thisPtr);
+                    return;
+                }
+
+                var numArray = atkStage->GetNumberArrayData(NumberArrayType.EnemyList);
 
                 // var numArray = Framework.Instance()->GetUIModule()->GetRaptureAtkModule()->AtkModule.AtkArrayDataHolder
                 //     .NumberArrays[21];
@@ -111,6 +120,15 @@ namespace EnemyListDebuffs
                     {
                         var localPlayerId = _plugin.ClientState.LocalPlayer?.GameObjectId;
                         if (localPlayerId is null)
+                        {
+                            _plugin.StatusNodeManager.HideUnusedStatus(i, 0);
+                            continue;
+                        }
+
+                        // 台服加固：GetNumberArrayData 可能回 null（該陣列尚未建立）；
+                        // 此處早退並隱藏本列狀態，避免對 null 陣列取索引造成 AVE。
+                        // 注意：CharacterManager.Instance() 是 [StaticAddress]（無 isPointer:true）＝A 類永不 null，故不判空（判了是死碼）。
+                        if (numArray == null)
                         {
                             _plugin.StatusNodeManager.HideUnusedStatus(i, 0);
                             continue;
