@@ -67,7 +67,7 @@ namespace EnemyListDebuffs
 
             CommandManager.AddHandler("/eldebuffs", new CommandInfo(this.ToggleConfig)
             {
-                HelpMessage = "Toggles config window."
+                HelpMessage = "切換設定視窗。"
             });
         }
         public void Dispose()
