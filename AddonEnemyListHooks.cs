@@ -129,7 +129,8 @@ namespace EnemyListDebuffs
                     }
                     else
                     {
-                        var localPlayerId = _plugin.ClientState.LocalPlayer?.GameObjectId;
+                        // API13：IClientState.LocalPlayer 已過時，改用 IObjectTable.LocalPlayer（純轉發）。
+                        var localPlayerId = _plugin.ObjectTable.LocalPlayer?.GameObjectId;
                         if (localPlayerId is null)
                         {
                             _plugin.StatusNodeManager.HideUnusedStatus(i, 0);
