@@ -13,6 +13,10 @@ namespace EnemyListDebuffs
         public string Name => "EnemyListDebuffs";
 
         public IClientState ClientState { get; private set; } = null!;
+
+        // API13 把 IClientState.LocalPlayer 標為過時，替代品是 IObjectTable.LocalPlayer。
+        // Dalamud 端 ClientState.LocalPlayer 本身就是 => this.objectTable.LocalPlayer 的純轉發。
+        public IObjectTable ObjectTable { get; private set; } = null!;
         public static ICommandManager CommandManager { get; private set; } = null!;
         public IDalamudPluginInterface Interface { get; private set; } = null!;
         public IDataManager DataManager { get; private set; } = null!;
@@ -38,9 +42,11 @@ namespace EnemyListDebuffs
             ISigScanner sigScanner,
             IGameInteropProvider gameInteropProvider,
             IAddonLifecycle addonLifecycle,
-            IPluginLog pluginLog)
+            IPluginLog pluginLog,
+            IObjectTable objectTable)
         {
             ClientState = clientState;
+            ObjectTable = objectTable;
             CommandManager = commandManager;
             DataManager = dataManager;
             Interface = pluginInterface;
@@ -67,7 +73,7 @@ namespace EnemyListDebuffs
 
             CommandManager.AddHandler("/eldebuffs", new CommandInfo(this.ToggleConfig)
             {
-                HelpMessage = "Toggles config window."
+                HelpMessage = "切換設定視窗。"
             });
         }
         public void Dispose()
