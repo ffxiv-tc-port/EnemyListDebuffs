@@ -13,17 +13,17 @@ namespace EnemyListDebuffs
         public string Name => "EnemyListDebuffs";
 
         public IClientState ClientState { get; private set; } = null!;
+
+        public IObjectTable ObjectTable { get; private set; } = null!;
         public static ICommandManager CommandManager { get; private set; } = null!;
         public IDalamudPluginInterface Interface { get; private set; } = null!;
         public IDataManager DataManager { get; private set; } = null!;
         public IFramework Framework { get; private set; } = null!;
-        public PluginAddressResolver Address { get; private set; } = null!;
         public StatusNodeManager StatusNodeManager { get; private set; } = null!;
-        public static ISigScanner SigScanner { get; private set; } = null!;
         public static AddonEnemyListHooks Hooks { get; private set; } = null!;
         public EnemyListDebuffsPluginUI UI { get; private set; } = null!;
         public EnemyListDebuffsPluginConfig Config { get; private set; } = null!;
-        public IGameInteropProvider GameInteropProvider { get; private set; } = null!;
+        public IGameGui GameGui { get; private set; } = null!;
         public IAddonLifecycle AddonLifecycle { get; private set; } = null!;
         public IPluginLog PluginLog { get; private set; } = null!;
 
@@ -35,26 +35,23 @@ namespace EnemyListDebuffs
             IDalamudPluginInterface pluginInterface, 
             IDataManager dataManager,
             IFramework framework, 
-            ISigScanner sigScanner,
-            IGameInteropProvider gameInteropProvider,
+            IGameGui gameGui,
             IAddonLifecycle addonLifecycle,
-            IPluginLog pluginLog)
+            IPluginLog pluginLog,
+            IObjectTable objectTable)
         {
             ClientState = clientState;
+            ObjectTable = objectTable;
             CommandManager = commandManager;
             DataManager = dataManager;
             Interface = pluginInterface;
             Framework = framework;
-            SigScanner = sigScanner;
-            GameInteropProvider = gameInteropProvider;
+            GameGui = gameGui;
             AddonLifecycle = addonLifecycle;
             PluginLog = pluginLog;
 
             Config = pluginInterface.GetPluginConfig() as EnemyListDebuffsPluginConfig ?? new EnemyListDebuffsPluginConfig();
             Config.Initialize(pluginInterface);
-
-            Address = new PluginAddressResolver(this);
-            Address.Setup(sigScanner);
 
             StatusNodeManager = new StatusNodeManager(this);
 
@@ -67,7 +64,7 @@ namespace EnemyListDebuffs
 
             CommandManager.AddHandler("/eldebuffs", new CommandInfo(this.ToggleConfig)
             {
-                HelpMessage = "Toggles config window."
+                HelpMessage = "切換設定視窗。"
             });
         }
         public void Dispose()
