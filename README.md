@@ -20,12 +20,12 @@
 
 ## 安裝
 
-在 Dalamud 設定的「自訂插件庫」加入
-`https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/repo.json`
-並啟用，再從插件列表安裝。
+`/xlsettings` 開「Dalamud 設定」→「試驗性功能」→「第三方插件倉庫」，加入 `https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/repo.json` 並啟用、儲存，再到「插件管理員」（`/xlplugins`）安裝；同一個插件只裝這裡的版本，不要同時裝上游版。
 
 ## 說明
 
 原作者已不再積極遊玩本作，上游處於尋求新維護者狀態；本 fork 由 ffxiv-tc-port 維護，供台服使用。
 
 原作者：Felys、aers
+
+授權：MIT（見 LICENSE）
